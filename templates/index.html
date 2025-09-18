@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Enkripsi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .animated-bg {
+            background: linear-gradient(-45deg, #f08285, #330e04, #fad0c4, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        .radio-container {
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .radio-label {
+            background-color: #dcdcdc;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .radio-label:hover,
+        .radio-input:checked+.radio-label {
+            background-color: #10ee83;
+            color: rgb(0, 0, 0);
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #loading:not(.hidden) {
+            opacity: 1;
+        }
+
+        #loading.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen animated-bg">
+    <div id="loading" class="hidden">
+        <svg class="animate-spin h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <p id="loadingText" class="mt-4 text-white text-lg font-medium"></p>
+    </div>
+
+    <div class="flex items-start space-x-10">
+        <!-- Form -->
+        <div class="bg-gray-200 p-8 rounded-lg shadow-lg w-96">
+            <h2 class="text-xl font-semibold text-center mb-4">File Enkripsi / Dekripsi</h2>
+            <form action="/proses" method="POST" enctype="multipart/form-data" id="form">
+                <label for=""> File:</label>
+                <input type="file" name="file" class="w-full p-3 mb-3 bg-gray-300 rounded focus:outline-none" required>
+                <p id="file-info" class="text-center text-sm text-gray-600 mt-1 mb-2"></p>
+                <label for="">Pilih proses:</label>
+                <select id="mode" name="mode" class="w-full p-3 mb-3 bg-gray-300 rounded focus:outline-none">
+                    <option value="enkripsi">Enkripsi</option>
+                    <option value="dekripsi">Dekripsi</option>
+                </select>
+                <label for=""> Masukan kunci:</label>
+                <input type="text" name="key" placeholder="Key"
+                    class="w-full p-3 mb-3 bg-gray-300 rounded focus:outline-none" required>
+                <div class="mb-5 mt-4">
+                    <label class="block font-semibold mb-2 text-center">Pilih Algoritma </label>
+                    <div class="radio-container">
+                        <input type="radio" id="all_algoritma" name="algoritma" value="all_algoritma"
+                            class="radio-input" required>
+                        <label for="all_algoritma" class="radio-label">All Algoritma</label>
+                        <input type="radio" id="aes_standard" name="algoritma" value="aes_standard" class="radio-input">
+                        <label for="aes_standard" class="radio-label">AES Standar</label>
+                        <input type="radio" id="chacha20" name="algoritma" value="Chacha20" class="radio-input">
+                        <label for="chacha20" class="radio-label">Chacha20</label>
+                        <input type="radio" id="aes_modified" name="algoritma" value="AES_Modified" class="radio-input">
+                        <label for="aes_modified" class="radio-label">AES Modifikasi</label>
+                        <input type="radio" id="mix" name="algoritma" value="Mix" class="radio-input">
+                        <label for="mix" class="radio-label">AESM + Chacha20</label>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full p-3 bg-gray-500 text-white rounded hover:bg-gray-600">Proses</button>
+            </form>
+
+            {% if results %}
+            <div class="mt-4">
+                {% if results|length == 1 %}
+                <!-- Tampilan untuk satu algoritma -->
+                <div class="text-center">
+                    <a href="/download/{{ results[0].processed_filename }}"
+                        class="block w-full p-3 text-center bg-green-500 text-white rounded hover:bg-gray-600">
+                        Download Hasil {{ select_mode }}
+                    </a>
+                </div>
+                <div class="mt-4 p-4 bg-white rounded shadow-lg">
+                    <h3 class="text-lg font-semibold text-center">Hasil Analisis</h3>
+                    <ul class="mt-2">
+                        <li><strong>Entropi Sebelum:</strong> {{ results[0].entropy_before|round(3) }}</li>
+                        <li><strong>Entropi Sesudah:</strong> {{ results[0].entropy_after|round(3) }}</li>
+                        <li><strong>Waktu Eksekusi:</strong> {{ results[0].execution_time|round(3) }} detik</li>
+                        <li><strong>Kecepatan Proses:</strong> {{ results[0].speed|round(3) }} KB/detik</li>
+                        <li><strong>File size:</strong> <span id="filesize"></span></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        {% if graph_link %}
+        <div class="text-center mt-10 bg-white p-8 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold">Grafik Analisis</h3>
+            <img src="{{ graph_link }}" alt="Grafik Analisis" class="rounded-lg shadow-lg w-100">
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sembunyikan loading saat halaman dimuat jika ada hasil
+        {% if results %}
+        document.getElementById("loading").classList.add("hidden");
+        document.querySelector('button[type="submit"]').disabled = false;
+        {% endif %}
+
+        const keyInput = document.querySelector("input[name='key']");
+        const form = document.querySelector("#form");
+        const modeSelect = document.getElementById("mode");
+        const loadingText = document.getElementById("loadingText");
+
+        keyInput.addEventListener("input", function () {
+            if (keyInput.value.length > 16) {
+                alert("Key tidak boleh lebih dari 16 karakter!");
+                keyInput.value = keyInput.value.slice(0, 16);
+            }
+        });
+
+        form.addEventListener("submit", function (event) {
+            if (keyInput.value.length < 16) {
+                alert("Key harus tepat 16 karakter!");
+                event.preventDefault();
+                return;
+            }
+
+            // Ambil mode yang dipilih (enkripsi/dekripsi)
+            const selectedMode = modeSelect.value === "enkripsi" ? "Enkripsi" : "Dekripsi";
+
+            // Ambil algoritma yang dipilih
+            const selectedAlgorithm = document.querySelector('input[name="algoritma"]:checked');
+            console.log(selectedAlgorithm);
+            let isAllAlgoritma = false;
+
+            let algorithmName = "Tidak diketahui";
+            if (selectedAlgorithm) {
+                switch (selectedAlgorithm.value) {
+                    case "aes_standard":
+                        algorithmName = "AES Standar";
+                        break;
+                    case "Chacha20":
+                        algorithmName = "ChaCha20";
+                        break;
+                    case "AES_Modified":
+                        algorithmName = "AES Modifikasi";
+                        break;
+                    case "Mix":
+                        algorithmName = "AESM + ChaCha20";
+                        break;
+                    case "all_algoritma":
+                        isAllAlgoritma = true;
+                        break;
+                    default:
+                        algorithmName = "Tidak diketahui";
+                        break;
+                }
+            }
+
+            // Buat teks loading dinamis
+           if (isAllAlgoritma) {
+                loadingText.textContent = "Memproses semua algoritma untuk enkripsi dan dekripsi, mohon tunggu...";
+            } else {
+                loadingText.textContent = `Memproses ${selectedMode} file dengan ${algorithmName}, mohon tunggu...`;
+            }
+
+            // Tampilkan animasi loading
+            document.getElementById("loading").classList.remove("hidden");
+
+            // Disable tombol submit untuk mencegah klik ganda
+            form.querySelector('button[type="submit"]').disabled = true;
+        });
+
+        document.querySelectorAll('input[name="algoritma"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                if (this.value === "all_algoritma") {
+                    form.action = "/all";
+                } else {
+                    form.action = "/proses";
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modeSelect = document.getElementById('mode');
+        const algoritmaRadios = document.querySelectorAll('input[name="algoritma"]');
+
+        algoritmaRadios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                if (this.value === 'all_algoritma') {
+                    // Ganti isi select mode
+                    modeSelect.innerHTML = `
+                        <option value="" readonly>Enkripsi dan Dekripsi</option>
+                    `;
+                } else {
+                    // Kembalikan isi default select mode
+                    modeSelect.innerHTML = `
+                        <option value="enkripsi">Enkripsi</option>
+                        <option value="dekripsi">Dekripsi</option>
+                    `;
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Baca ukuran file yang di upload -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.querySelector('input[name="file"]');
+
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];  // Ambil file pertama yang dipilih
+            if (file) {
+                const fileSizeKB = file.size / 1024;
+                let displaySize = "";
+
+                if (fileSizeKB >= 1024) {
+                    const sizeMB = fileSizeKB / 1024;
+                    displaySize = sizeMB.toFixed(2) + " MB";
+                } else {
+                    displaySize = fileSizeKB.toFixed(2) + " KB";
+                }
+
+                console.log("Ukuran file:", displaySize);
+
+                // Contoh: menampilkan di halaman
+                const infoElement = document.getElementById("file-info");
+                if (infoElement) {
+                    infoElement.textContent = "Ukuran file: " + displaySize;
+                }
+            }
+        });
+    });
+</script>
+
+{% if file_size %}
+<script>
+    const filesizeKB = {{ file_size | tojson }};  // ukuran dalam KB
+    console.log("size", filesizeKB);
+    
+    let displaySize = "";
+    if (filesizeKB >= 1024) {
+        // Jika ukuran lebih dari atau sama dengan 1MB
+        const sizeMB = filesizeKB / 1024;
+        displaySize = sizeMB.toFixed(2) + " MB";
+    } else {
+        // Jika ukuran kurang dari 1MB
+        displaySize = filesizeKB.toFixed(2) + " KB";
+    }
+    // Menampilkan di elemen HTML (jika perlu)
+    document.getElementById("filesize").textContent = displaySize;
+
+</script>
+{% endif %}
+
+</html>

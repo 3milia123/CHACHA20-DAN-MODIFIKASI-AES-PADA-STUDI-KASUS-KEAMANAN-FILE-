@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Line Chart Performa Algoritma</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    .chart-container {
+      max-width: 600px;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>Performa Enkripsi</h2>
+  <div class="chart-container"><canvas id="kecepatan_enkripsi"></canvas></div>
+  <div class="chart-container"><canvas id="waktu_enkripsi"></canvas></div>
+  <div class="chart-container"><canvas id="entorpi_enkripsi"></canvas></div>
+  <div class="chart-container"><canvas id="entorpiafter_enkripsi"></canvas></div>
+
+  <h2>Performa Dekripsi</h2>
+  <div class="chart-container"><canvas id="kecepatan_dekripsi"></canvas></div>
+  <div class="chart-container"><canvas id="waktu_dekripsi"></canvas></div>
+  <div class="chart-container"><canvas id="entorpi_dekripsi"></canvas></div>
+  <div class="chart-container"><canvas id="entorpiafter_dekripsi"></canvas></div>
+
+  <script>
+    const ctx = document.getElementById('kecepatan_enkripsi').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['100KB', '1MB'], // titik jarak tempuh
+        datasets: [
+          {
+            label: 'Chacha20',
+            data: [3421.032, 91221.507],
+            borderColor: 'blue',
+            fill: false,
+          },
+          {
+            label: 'aes_standard',
+            data: [59.773, 40.927],
+            borderColor: 'green',
+            fill: false,
+          },
+          {
+            label: 'AES_Modified',
+            data: [45.828, 37.982],
+            borderColor: 'red',
+            fill: false,
+          },
+          {
+            label: 'Mix',
+            data: [49.553, 38.08],
+            borderColor: 'red',
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Grafik Kecepatan enkripsi'
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Kecepatan (kb/detik)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Ukuran file'
+            }
+          }
+        }
+      }
+    });
+
+    const waktu = document.getElementById('waktu_enkripsi').getContext('2d');
+
+    new Chart(waktu, {
+      type: 'line',
+      data: {
+        labels: ['100KB', '1MB'], // titik jarak tempuh
+        datasets: [
+          {
+            label: 'Chacha20',
+            data: [26.996, 10.993],
+            borderColor: 'blue',
+            fill: false,
+          },
+          {
+            label: 'aes_standard',
+            data: [1545.096, 26400.841],
+            borderColor: 'green',
+            fill: false,
+          },
+          {
+            label: 'AES_Modified',
+            data: [2015.268, 24500.791],
+            borderColor: 'red',
+            fill: false,
+          },
+          {
+            label: 'Mix',
+            data: [1863.786, 26333.092],
+            borderColor: 'red',
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Grafik waktu enkripsi'
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'waktu (ms)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Ukuran file'
+            }
+          }
+        }
+      }
+    });
+
+    const entropi = document.getElementById('entorpi_enkripsi').getContext('2d');
+
+    new Chart(entropi, {
+      type: 'line',
+      data: {
+        labels: ['100KB', '1MB'], // titik jarak tempuh
+        datasets: [
+          {
+            label: 'Chacha20',
+            data: [7.948, 7.391],
+            borderColor: 'blue',
+            fill: false,
+          },
+          {
+            label: 'aes_standard',
+            data: [7.948, 7.391],
+            borderColor: 'green',
+            fill: false,
+          },
+          {
+            label: 'AES_Modified',
+            data: [7.948, 7.391],
+            borderColor: 'red',
+            fill: false,
+          },
+          {
+            label: 'Mix',
+            data: [7.948, 7.391],
+            borderColor: 'red',
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Grafik Entropi sebelum enkripsi'
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Tingkat keacakan'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Ukuran file'
+            }
+          }
+        }
+      }
+    });
+
+    const entropiafter = document.getElementById('entorpiafter_enkripsi').getContext('2d');
+
+    new Chart(entropi, {
+      type: 'line',
+      data: {
+        labels: ['100KB', '1MB'], // titik jarak tempuh
+        datasets: [
+          {
+            label: 'Chacha20',
+            data: [7.948, 8.000],
+            borderColor: 'blue',
+            fill: false,
+          },
+          {
+            label: 'aes_standard',
+            data: [7.948, 7.365],
+            borderColor: 'green',
+            fill: false,
+          },
+          {
+            label: 'AES_Modified',
+            data: [7.948, 7.965],
+            borderColor: 'red',
+            fill: false,
+          },
+          {
+            label: 'Mix',
+            data: [7.948, 8.000],
+            borderColor: 'red',
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Grafik Entropi sesudah enkripsi'
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Tingkat keacakan'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Ukuran file'
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+<!-- chart dekripsi -->
+<script>
+  const kecepatan_dekripsi = document.getElementById('kecepatan_dekripsi').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['100KB', '1MB'], // titik jarak tempuh
+      datasets: [
+        {
+          label: 'Chacha20',
+          data: [3419.866, 91221.507],
+          borderColor: 'blue',
+          fill: false,
+        },
+        {
+          label: 'aes_standard',
+          data: [59.773, 40.927],
+          borderColor: 'green',
+          fill: false,
+        },
+        {
+          label: 'AES_Modified',
+          data: [45.828, 37.982],
+          borderColor: 'red',
+          fill: false,
+        },
+        {
+          label: 'Mix',
+          data: [49.553, 38.08],
+          borderColor: 'red',
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Grafik Kecepatan enkripsi'
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Kecepatan (kb/detik)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Ukuran file'
+          }
+        }
+      }
+    }
+  });
+
+  const waktu = document.getElementById('waktu_enkripsi').getContext('2d');
+
+  new Chart(waktu, {
+    type: 'line',
+    data: {
+      labels: ['100KB', '1MB'], // titik jarak tempuh
+      datasets: [
+        {
+          label: 'Chacha20',
+          data: [26.996, 10.993],
+          borderColor: 'blue',
+          fill: false,
+        },
+        {
+          label: 'aes_standard',
+          data: [1545.096, 26400.841],
+          borderColor: 'green',
+          fill: false,
+        },
+        {
+          label: 'AES_Modified',
+          data: [2015.268, 24500.791],
+          borderColor: 'red',
+          fill: false,
+        },
+        {
+          label: 'Mix',
+          data: [1863.786, 26333.092],
+          borderColor: 'red',
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Grafik waktu enkripsi'
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'waktu (ms)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Ukuran file'
+          }
+        }
+      }
+    }
+  });
+
+  const entropi = document.getElementById('entorpi_enkripsi').getContext('2d');
+
+  new Chart(entropi, {
+    type: 'line',
+    data: {
+      labels: ['100KB', '1MB'], // titik jarak tempuh
+      datasets: [
+        {
+          label: 'Chacha20',
+          data: [7.948, 7.391],
+          borderColor: 'blue',
+          fill: false,
+        },
+        {
+          label: 'aes_standard',
+          data: [7.948, 7.391],
+          borderColor: 'green',
+          fill: false,
+        },
+        {
+          label: 'AES_Modified',
+          data: [7.948, 7.391],
+          borderColor: 'red',
+          fill: false,
+        },
+        {
+          label: 'Mix',
+          data: [7.948, 7.391],
+          borderColor: 'red',
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Grafik Entropi sebelum enkripsi'
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Tingkat keacakan'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Ukuran file'
+          }
+        }
+      }
+    }
+  });
+
+  const entropiafter = document.getElementById('entorpiafter_enkripsi').getContext('2d');
+
+  new Chart(entropi, {
+    type: 'line',
+    data: {
+      labels: ['100KB', '1MB'], // titik jarak tempuh
+      datasets: [
+        {
+          label: 'Chacha20',
+          data: [7.948, 8.000],
+          borderColor: 'blue',
+          fill: false,
+        },
+        {
+          label: 'aes_standard',
+          data: [7.948, 7.365],
+          borderColor: 'green',
+          fill: false,
+        },
+        {
+          label: 'AES_Modified',
+          data: [7.948, 7.965],
+          borderColor: 'red',
+          fill: false,
+        },
+        {
+          label: 'Mix',
+          data: [7.948, 8.000],
+          borderColor: 'red',
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Grafik Entropi sesudah enkripsi'
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: 'Tingkat keacakan'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Ukuran file'
+          }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
